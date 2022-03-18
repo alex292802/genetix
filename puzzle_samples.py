@@ -5,9 +5,12 @@ import random as rd
 class puzzle_sample:
 
     def __init__(self, sample_size = int, puzzle_size = int, dlamb = 1.2, dlinear = True, pieces = None, from_zero = True, pus = None):
+        
         self.fit = None
         self.s = sample_size
+        #Taille du puzzle 
         self.pss = puzzle_size
+
 
         if from_zero:
             ps = np.empty(0, dtype = pz.puzzle)

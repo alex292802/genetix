@@ -3,7 +3,7 @@ def parse(char):
     data = text_file.read()
     text_file.close()
     data = data.split("\n")  # On sépare chaque ligne d'information pour les mettre dans une liste
-    print(data)
+
     def intl(lis):  # pour avoir des entiers en valeur
         for i in range(len(lis)):
             #print(int(lis[i]))

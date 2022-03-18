@@ -4,16 +4,22 @@ import puzzle as pz
 import puzzle_samples as pzs
 import Parser as pr
 
-
+#On récupére le puzzle à l'aide du Parser
 data=pr.parse("benchEternity2.txt")
-print(data)
+#On transforme la data en une liste de liste
 pi = np.array([np.array(i) for i in data])
-obj = pzs.puzzle_sample(10, 16, pieces = pi)
-print(obj.r,obj.fit)
+for i in range(len(pi)):
+    print(pi[i])
+
+obj = pz.puzzle(16, pieces = pi)
+obj.render()
+
+'''print(obj.r,obj.fit)
 obj.best_render()
 
 pu = pz.puzzle(16, pi)
-pu.render()
+#pu.render()
 pu.mutation_swap()
-pu.render()
+#pu.render()
 
+'''
