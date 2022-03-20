@@ -20,7 +20,8 @@ class puzzle:
 
     def mutation_swap(self):
         a,b = rd.randrange(self.s**2),rd.randrange(self.s**2)
-        self.conf[b],self.conf[a] = self.conf[a],self.conf[b]
+        self.conf[b],self.conf[a], self.conf[b].x,self.conf[a].x, self.conf[b].y,self.conf[a].y = self.conf[a],self.conf[b], self.conf[a].x,self.conf[b].x, self.conf[a].y,self.conf[b].y
+
 
     def mutation_rotation(self):
         a = rd.randrange(self.s**2)
@@ -40,9 +41,9 @@ class puzzle:
                 score += int(piece.nord == piece_.sud and piece.nord != 0)
                 score_ += int(piece.nord != piece_.sud or piece.nord == 0)
 
-            if piece.y == self.s - 1:
-                score += int(piece.sud == 0)
-                score_ += int(piece.sud != 0)
+                if piece.y == self.s - 1:
+                    score += int(piece.sud == 0)
+                    score_ += int(piece.sud != 0)
 
             if piece.x == 0:
                 score += int(piece.ouest == 0)
@@ -53,9 +54,9 @@ class puzzle:
                 score += int(piece.ouest == piece__.est and piece.ouest != 0)
                 score_ += int(piece.ouest != piece__.est or piece.ouest == 0)
 
-            if piece.x == self.s - 1:
-                score += int(piece.est == 0)
-                score_ += int(piece.est != 0)
+                if piece.x == self.s - 1:
+                    score += int(piece.est == 0)
+                    score_ += int(piece.est != 0)
 
         return score_
 
