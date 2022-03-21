@@ -11,10 +11,15 @@ data=pr.parse("benchEternity2.txt")
 pi = np.array([np.array(i) for i in data])
 
 
-obj = pz.puzzle(16, pieces = pi)
+obj = pzs.puzzle_sample(10, 4, pieces = pi)
 
-obj.mutation_swap()
+obj.ps[0].render()
+obj.ps[1].render()
 
+a, b = obj.hybrydation(obj.ps[0], obj.ps[1])
+
+a.render()
+b.render()
 
 '''print(obj.r,obj.fit)
 obj.best_render()

@@ -6,51 +6,56 @@ import piece as pc
 class puzzle:
     
     #pieces représente le puzzle complet 
-    def __init__(self, size=int, pieces=np.ndarray):
+    def __init__(self, size=int, pieces=np.ndarray, aleatoire = True):
         #On récupére la taille du puzzle 
         self.s = size
-        
+
         # Notre nouvelle configuration de puzzle :
         new_conf = np.empty(0, dtype=pc.piece)
-        
-        #On crée une liste des indices correspondant à chaque pièce et on la mélange 
-        in_coins = [0,1,2,3]
-        in_bords = [i for i in range(4,(self.s - 1) * 4)]
-        in_milieu = [i for i in range((self.s - 1) * 4, self.s ** 2)]
 
-        np.random.shuffle(in_coins)
-        np.random.shuffle(in_bords)
-        np.random.shuffle(in_milieu)
-        
-        #On crée une nouvelle configuration en prenant aléatoirement une nouvelle pièce, on la tourne aléatoirement
-        for i in range(self.s ** 2):
-            
-            if i in [i for i in range(1,self.s - 1)]:
-                new_conf = np.append(new_conf, pc.piece(np.array(pieces[in_bords.pop()]), 0, new_conf.size, self.s))
-                
-            elif i in [i*self.s+self.s - 1 for i in range(1,self.s - 1)]:
-                new_conf = np.append(new_conf, pc.piece(np.array(pieces[in_bords.pop()]), 3, new_conf.size, self.s))
-                    
-            elif i in [i for i in range(self.s * (self.s - 1) + 1,self.s ** 2 -1)]:
-                new_conf = np.append(new_conf, pc.piece(np.array(pieces[in_bords.pop()]), 2, new_conf.size, self.s))
-                
-            elif i in [i*self.s for i in range(1,self.s - 1)]:
-                new_conf = np.append(new_conf, pc.piece(np.array(pieces[in_bords.pop()]), 1, new_conf.size, self.s))
-                
-            elif i == 0:
-                new_conf = np.append(new_conf, pc.piece(np.array(pieces[in_coins.pop()]), 1, new_conf.size, self.s))
-                
-            elif i == self.s - 1:
-                new_conf = np.append(new_conf, pc.piece(np.array(pieces[in_coins.pop()]), 0, new_conf.size, self.s))
-            
-            elif i == self.s ** 2 -1:
-                new_conf = np.append(new_conf, pc.piece(np.array(pieces[in_coins.pop()]), 3, new_conf.size, self.s))
-                    
-            elif i == self.s * (self.s - 1):
-                new_conf = np.append(new_conf, pc.piece(np.array(pieces[in_coins.pop()]), 2, new_conf.size, self.s))
-                
-            else:
-                new_conf = np.append(new_conf, pc.piece(np.array(pieces[in_milieu.pop()]), rd.randrange(4), new_conf.size, self.s))
+        if aleatoire:
+            #On crée une liste des indices correspondant à chaque pièce et on la mélange
+            in_coins = [0,1,2,3]
+            in_bords = [i for i in range(4,(self.s - 1) * 4)]
+            in_milieu = [i for i in range((self.s - 1) * 4, self.s ** 2)]
+
+            np.random.shuffle(in_coins)
+            np.random.shuffle(in_bords)
+            np.random.shuffle(in_milieu)
+
+
+            #On crée une nouvelle configuration en prenant aléatoirement une nouvelle pièce, on la tourne aléatoirement
+            for i in range(self.s ** 2):
+
+                if i in [i for i in range(1,self.s - 1)]:
+                    new_conf = np.append(new_conf, pc.piece(np.array(pieces[in_bords.pop()]), 0, new_conf.size, self.s))
+
+                elif i in [i*self.s+self.s - 1 for i in range(1,self.s - 1)]:
+                    new_conf = np.append(new_conf, pc.piece(np.array(pieces[in_bords.pop()]), 3, new_conf.size, self.s))
+
+                elif i in [i for i in range(self.s * (self.s - 1) + 1,self.s ** 2 -1)]:
+                    new_conf = np.append(new_conf, pc.piece(np.array(pieces[in_bords.pop()]), 2, new_conf.size, self.s))
+
+                elif i in [i*self.s for i in range(1,self.s - 1)]:
+                    new_conf = np.append(new_conf, pc.piece(np.array(pieces[in_bords.pop()]), 1, new_conf.size, self.s))
+
+                elif i == 0:
+                    new_conf = np.append(new_conf, pc.piece(np.array(pieces[in_coins.pop()]), 1, new_conf.size, self.s))
+
+                elif i == self.s - 1:
+                    new_conf = np.append(new_conf, pc.piece(np.array(pieces[in_coins.pop()]), 0, new_conf.size, self.s))
+
+                elif i == self.s ** 2 -1:
+                    new_conf = np.append(new_conf, pc.piece(np.array(pieces[in_coins.pop()]), 3, new_conf.size, self.s))
+
+                elif i == self.s * (self.s - 1):
+                    new_conf = np.append(new_conf, pc.piece(np.array(pieces[in_coins.pop()]), 2, new_conf.size, self.s))
+
+                else:
+                    new_conf = np.append(new_conf, pc.piece(np.array(pieces[in_milieu.pop()]), rd.randrange(4), new_conf.size, self.s))
+
+        else:
+            new_conf = pieces
 
         self.conf = new_conf
         self.eval = self.evaluation()
@@ -102,8 +107,9 @@ class puzzle:
 
     #On tourne la pièce une fois dans le sens trigonomètrique
     def mutation_rotation(self):
-        a = rd.randrange(self.s**2)
+        a = rd.choice(self.inn_milieu)
         self.conf[a].rotate()
+        self.eval = self.evaluation()
 
     #On évalue le score de notre config
     def evaluation(self):
