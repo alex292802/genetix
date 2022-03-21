@@ -6,13 +6,15 @@ import Parser as pr
 
 #On récupére le puzzle à l'aide du Parser
 data=pr.parse("benchEternity2.txt")
+
 #On transforme la data en une liste de liste
 pi = np.array([np.array(i) for i in data])
-for i in range(len(pi)):
-    print(pi[i])
+
 
 obj = pz.puzzle(16, pieces = pi)
-obj.render()
+
+obj.mutation_swap()
+
 
 '''print(obj.r,obj.fit)
 obj.best_render()
