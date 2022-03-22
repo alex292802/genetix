@@ -1,6 +1,14 @@
 import puzzle as pz
 import numpy as np
 import random as rd
+import piece as pc
+
+def contains(lis, lofl):
+    for i in lofl:
+        if (i == lis).sum() == 4:
+            return True
+
+    return False
 
 class puzzle_sample:
 
@@ -25,6 +33,9 @@ class puzzle_sample:
 
         self.r = self.ranking(lamb = dlamb, linear = dlinear)
 
+    def compatible(self,zone1,zone2):
+        return (zone1[0] == 2 and zone2[0] == 2) or (zone1[0] == 2 and zone2[0] == 2) or  (zone1[0] == 2 and zone2[0] == 2) or (zone1[0] == 2 and zone2[0] == 2)
+
     def ranking(self, lamb = float, linear = bool):
 
         f = lambda x: x.eval
@@ -47,8 +58,10 @@ class puzzle_sample:
     def hybrydation(self, puzzle, puzzle_):
         leng = rd.randrange(1, self.pss // 2 + 1)
         wid = rd.randrange(1, self.pss // 2 + 1)
-        x1 = 1
-        y1 = 1
+
+        #X1 et Y1 sont initialisés de manière à ce que l'aire ne dépasse pas le carré
+        x1 = rd.randrange(1, self.pss - leng)
+        y1 = rd.randrange(1, self.pss - wid)
         """x1 = rd.randrange(self.pss + 1 -leng)
         y1 = rd.randrange(self.pss + 1 - wid)"""
         data_zone_puzzle = []
@@ -62,7 +75,57 @@ class puzzle_sample:
         index_exclu_puzzle_ = []
 
         if (x1 == 0 and y1 == 0) or (x1 == 0 and y1 + wid == self.pss) or (x1 + leng == self.pss and y1 == 0) or (x1 + leng == self.pss and y1 + wid == self.pss):
-            print('jdk')
+            x2 = rd.choice([0, self.pss - len])
+            y2 = rd.randrange([0, self.pss - wid])
+
+            while x1 == x2 and y1 == y2:
+                x2 = rd.choice([0, self.pss - len])
+
+                y2 = rd.randrange([0, self.pss - wid])
+
+            for i in range(wid):
+                for j in range(leng):
+                    data_zone_puzzle.append([np.array(puzzle.conf[x1 + j + self.pss * (y1 + i)].data), puzzle.conf[x1 + j + self.pss * (y1 + i)].rot])
+                    data_zone_puzzle_.append([np.array(puzzle_.conf[x2 + j + self.pss * (y2 + i)].data), puzzle_.conf[x2 + j + self.pss * (y2 + i)].rot])
+
+            compteur = 0
+            while not compatible(data_zone_puzzle, data_zone_puzzle_):
+                rota_zone(data_zone_puzzle)
+                compteur += 1
+
+            for i in range(4 - compteur):
+                rota_zone(data_zone_puzzle_)
+
+            for i in range(len(data_zone_puzzle)):
+                if contains(data_zone_puzzle[i][0], [j[0] for j in data_zone_puzzle_]):
+                    inter.append(data_zone_puzzle[i])
+
+                else :
+                    exclu_puzzle.append(data_zone_puzzle[i])
+
+            for i in range(len(data_zone_puzzle)):
+                if not(contains(data_zone_puzzle_[i][0], [j[0] for j in data_zone_puzzle])):
+                    exclu_puzzle_.append(data_zone_puzzle_[i])
+
+                data_zone_puzzle_[i] = pc.piece(np.array(data_zone_puzzle_[i][0]), data_zone_puzzle_[i][1], 0, self.pss)
+
+            for i in range(len(data_zone_puzzle)):
+                data_zone_puzzle[i] = pc.piece(np.array(data_zone_puzzle[i][0]), data_zone_puzzle[i][1], 0, self.pss)
+
+            print(exclu_puzzle, exclu_puzzle_)
+            for i in range (len(exclu_puzzle)):
+                exclu_puzzle[i] = pc.piece(np.array(exclu_puzzle[i][0]), exclu_puzzle[i][1], 0, self.pss)
+
+                for j in range(len(puzzle_.conf)):
+                    if (exclu_puzzle[i].data == puzzle_.conf[j].data).sum() == 4:
+                        index_exclu_puzzle_.append(j)
+
+            for i in range(len(exclu_puzzle_)):
+                exclu_puzzle_[i] = pc.piece(np.array(exclu_puzzle_[i][0]), exclu_puzzle_[i][1], 0, self.pss)
+
+                for j in range(len(puzzle.conf)):
+                    if (exclu_puzzle_[i].data == puzzle.conf[j].data).sum() == 4:
+                        index_exclu_puzzle.append(j)
 
         elif x1 == 0 or y1 == 0 or x1 + leng == self.pss or y1 + wid == self.pss:
             print('hjif')
@@ -71,62 +134,66 @@ class puzzle_sample:
             x2 = rd.randrange(1, self.pss - leng)
             y2 = rd.randrange(1, self.pss - wid)
 
-            for i in range(leng):
-                for j in range(wid):
-                    data_zone_puzzle.append(puzzle.conf[x1 + i + self.pss * (y1 + j)].data)
-                    data_zone_puzzle_.append(puzzle.conf[x2 + i + self.pss * (y2 + j)].data)
+            for i in range(wid):
+                for j in range(leng):
+                    data_zone_puzzle.append([np.array(puzzle.conf[x1 + j + self.pss * (y1 + i)].data), puzzle.conf[x1 + j + self.pss * (y1 + i)].rot])
+                    data_zone_puzzle_.append([np.array(puzzle_.conf[x2 + j + self.pss * (y2 + i)].data), puzzle_.conf[x2 + j + self.pss * (y2 + i)].rot])
 
 
             for i in range(len(data_zone_puzzle)):
-                if data_zone_puzzle[i] in data_zone_puzzle_:
+                if contains(data_zone_puzzle[i][0], [j[0] for j in data_zone_puzzle_]):
                     inter.append(data_zone_puzzle[i])
 
                 else :
                     exclu_puzzle.append(data_zone_puzzle[i])
 
             for i in range(len(data_zone_puzzle)):
-                if data_zone_puzzle_[i] not in data_zone_puzzle:
+                if not(contains(data_zone_puzzle_[i][0], [j[0] for j in data_zone_puzzle])):
                     exclu_puzzle_.append(data_zone_puzzle_[i])
 
+                data_zone_puzzle_[i] = pc.piece(np.array(data_zone_puzzle_[i][0]), data_zone_puzzle_[i][1], 0, self.pss)
 
+            for i in range(len(data_zone_puzzle)):
+                data_zone_puzzle[i] = pc.piece(np.array(data_zone_puzzle[i][0]), data_zone_puzzle[i][1], 0, self.pss)
+
+            print(exclu_puzzle, exclu_puzzle_)
             for i in range (len(exclu_puzzle)):
-                piece=exclu_puzzle[i]
+                exclu_puzzle[i] = pc.piece(np.array(exclu_puzzle[i][0]), exclu_puzzle[i][1], 0, self.pss)
 
                 for j in range(len(puzzle_.conf)):
-                    if piece == puzzle_.conf[j].data:
+                    if (exclu_puzzle[i].data == puzzle_.conf[j].data).sum() == 4:
                         index_exclu_puzzle_.append(j)
 
             for i in range(len(exclu_puzzle_)):
-                piece = exclu_puzzle_[i]
+                exclu_puzzle_[i] = pc.piece(np.array(exclu_puzzle_[i][0]), exclu_puzzle_[i][1], 0, self.pss)
 
                 for j in range(len(puzzle.conf)):
-                    if piece == puzzle.conf[j].data:
+                    if (exclu_puzzle_[i].data == puzzle.conf[j].data).sum() == 4:
                         index_exclu_puzzle.append(j)
 
-            print(index_exclu_puzzle_,data_zone_puzzle, leng, wid, x1, y1, x2, y2)
-            for i in range(self.pss ** 2):
-                if i in index_exclu_puzzle_:
-                    hybr_.append(exclu_puzzle_.pop(0))
 
-                elif x2 <= (i % self.pss) < x2 + leng and y2 <= (i // self.pss) < y2 + wid:
-                    print(i)
-                    hybr_.append(data_zone_puzzle.pop(0))
+        for i in range(self.pss ** 2):
+            if i in index_exclu_puzzle_:
+                hybr_.append(exclu_puzzle_.pop(0))
 
-                else:
-                    hybr_.append(puzzle_.conf[i])
+            elif x2 <= (i % self.pss) < x2 + leng and y2 <= (i // self.pss) < y2 + wid:
+                hybr_.append(data_zone_puzzle.pop(0))
 
-            for i in range(self.pss ** 2):
-                if i in index_exclu_puzzle:
-                    hybr.append(exclu_puzzle.pop(0))
+            else:
+                hybr_.append(puzzle_.conf[i])
 
-                elif x1 <= (i % self.pss) < x1 + leng and y1 <= (i // self.pss) < y1 + wid:
-                    hybr.append(data_zone_puzzle_.pop(0))
+        for i in range(self.pss ** 2):
+            if i in index_exclu_puzzle:
+                hybr.append(exclu_puzzle.pop(0))
 
-                else:
-                    hybr.append(puzzle.conf[i])
+            elif x1 <= (i % self.pss) < x1 + leng and y1 <= (i // self.pss) < y1 + wid:
+                hybr.append(data_zone_puzzle_.pop(0))
 
-        print(index_exclu_puzzle, x1, y1)
-        return pz.puzzle(4, hybr, aleatoire = False), pz.puzzle(4, hybr_, aleatoire = False)
+            else:
+                hybr.append(puzzle.conf[i])
+
+        print(x1,y1,leng,wid,x2,y2,index_exclu_puzzle, index_exclu_puzzle)
+        return pz.puzzle(self.pss, hybr, aleatoire = False), pz.puzzle(self.pss, hybr_, aleatoire = False)
 
     def evolution(self,  gc_sample = int, elitism_rate = float, nb_new_gen = int, mu_rot_rate = float, mu_swap_rate = float):
         new_gen = np.empty(0, dtype = pz.puzzle)
