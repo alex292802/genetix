@@ -7,7 +7,7 @@ class piece:
     #rotation : de combien ou tourne la pièce 
     #no : numéro de la pièce 
     def __init__(self, borders=np.ndarray, rotation=int, no=int, psize=int):
-        
+        self.rot = rotation
         self.data = borders 
         self.nord = borders[rotation]
         self.est = borders[(rotation + 1) % 4]
